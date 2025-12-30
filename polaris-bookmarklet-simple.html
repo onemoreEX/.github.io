@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポラリスコード レート計算機 ブックマークレット（シンプル版）</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.8;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ff6b9d;
+            border-bottom: 3px solid #ff6b9d;
+            padding-bottom: 10px;
+        }
+        .bookmarklet-link {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #ff6b9d, #ffa3d1);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+        }
+        .bookmarklet-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 107, 157, 0.4);
+        }
+        .code-box {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 4px solid #ff6b9d;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 ポラリスコード レート計算機<br>ブックマークレット（動作確認済み版）</h1>
+
+        <h2>🖥️ PCでの使い方</h2>
+        <div class="step">
+            <strong>Step 1:</strong> 下のピンクのボタンをブックマークバーにドラッグ＆ドロップ
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="" id="bookmarklet-link" class="bookmarklet-link">
+                📊 ポラリスレート計算
+            </a>
+        </div>
+
+        <div class="step">
+            <strong>Step 2:</strong> ポラリスコードのPA SKILLページを開く
+        </div>
+
+        <div class="step">
+            <strong>Step 3:</strong> ブックマークバーの「ポラリスレート計算」をクリック
+        </div>
+
+        <h2>📱 スマホでの使い方</h2>
+
+        <div class="step">
+            <strong>Step 1:</strong> このページを適当な名前でブックマークに保存
+        </div>
+
+        <div class="step">
+            <strong>Step 2:</strong> 下のコードをコピー
+            <div class="code-box" id="bookmarklet-code" style="max-height: 200px; overflow-y: auto;"></div>
+            <button onclick="copyCode()">📋 コードをコピー</button>
+        </div>
+
+        <div class="step">
+            <strong>Step 3:</strong> ブックマークを編集して、URLの部分に貼り付け
+        </div>
+
+        <div class="step">
+            <strong>Step 4:</strong> ポラリスコードのPA SKILLページでブックマークをタップ
+        </div>
+
+        <h2>⚙️ 機能</h2>
+        <ul>
+            <li>各楽曲のレート計算</li>
+            <li>目標レートまでに必要なアチーブメント率表示</li>
+            <li>PA SKILL分析（目標平均レート計算）</li>
+            <li>スマホ対応レスポンシブデザイン</li>
+        </ul>
+
+        <h2>🔧 目標レート変更方法</h2>
+        <p>コードの最初の部分 <code>const T=15</code> の数値を変更してください（例: 15.2, 16.0など）</p>
+
+        <h2>⚠️ 注意</h2>
+        <ul>
+            <li>ポラリスコードのPA SKILLページでのみ動作します</li>
+            <li>初回実行時にGoogle Sheetsから譜面定数を取得します（数秒かかります）</li>
+            <li>iOSの場合、設定で「サイト越えトラッキングを防ぐ」がオンだとデータ取得に失敗する可能性があります</li>
+        </ul>
+    </div>
+
+    <script>
+        // ブックマークレットコード生成
+        const bookmarkletCode = `javascript:(function(){const T=15;function calcRate(c,a){const r=parseFloat(a);let s=0;if(r>=99.5)s=(r-99.5)*0.6+2;else if(r>=98)s=(r-98)+0.5;else if(r>=95)s=(r-95)*0.166;else if(r>=85)s=(r-85)*0.1;return c+s}function calcReq(c,t){const rc=t-c;if(calcRate(c,100)<t)return null;if(rc>=2){const r=99.5+(rc-2)/0.6;if(r<=100)return r}if(rc>=0.5){const r=98+(rc-0.5);if(r<99.5)return r;return 99.5+(rc-2)/0.6}if(rc>=0){const r=95+rc/0.166;if(r<98)return r;return 98+(rc-0.5)}if(rc>0){const r=85+rc/0.1;if(r<=95)return r;return 95+rc/0.166}return null}let cc={};function norm(n){return n.trim().replace(/[Ａ-Ｚａ-ｚ０-９]/g,s=>String.fromCharCode(s.charCodeAt(0)-0xFEE0)).replace(/！/g,'!').replace(/？/g,'?').replace(/：/g,':').replace(/\\s+/g,' ').trim()}function parseTSV(txt){const c={};const ls=txt.split('\\n');for(let i=1;i<ls.length;i++){const l=ls[i].trim();if(!l)continue;const cols=l.split('\\t');let sn='',inf='',hrd='',diff='';if(cols.length>=5&&cols[1]&&cols[0].match(/^\\d+$/)){sn=cols[1].trim();diff=cols[2]?cols[2].trim().toUpperCase():'';inf=cols[4]?cols[4].trim():'';hrd=cols[6]?cols[6].trim():'';}else if(cols.length>=4&&cols[0]&&!cols[0].match(/^\\d+$/)){sn=cols[0].trim();diff=cols[1]?cols[1].trim().toUpperCase():'';inf=cols[3]?cols[3].trim():'';hrd=cols[5]?cols[5].trim():'';}if(sn){const nn=norm(sn);if(diff&&(diff==='INF'||diff==='INFLUENCE')){if(inf&&inf!=='-'){const ct=parseFloat(inf);if(!isNaN(ct))c[nn+'_INF']=ct;}}else if(diff&&(diff==='HARD'||diff==='HRD')){if(inf&&inf!=='-'){const ct=parseFloat(inf);if(!isNaN(ct))c[nn+'_HARD']=ct;}}else{if(inf&&inf!=='-'){const ct=parseFloat(inf);if(!isNaN(ct))c[nn+'_INF']=ct;}if(hrd&&hrd!=='-'){const ct=parseFloat(hrd);if(!isNaN(ct))c[nn+'_HARD']=ct;}}}}return c}async function fetchCC(){try{const r=await fetch('https://docs.google.com/spreadsheets/d/1nC9tfgg0vTQttDCACbZr9aDWKWjEtk676ZlRVW-glUk/export?format=tsv&gid=512804297',{mode:'cors'});if(!r.ok)throw new Error('HTTP '+r.status);const txt=await r.text();cc=parseTSV(txt);return cc;}catch(e){alert('譜面定数取得失敗');throw e;}}function extractScores(){const sc=[];document.querySelectorAll('.music_data').forEach(el=>{const snEl=el.querySelector('.title_name');const achEl=el.querySelector('.achievement_rate.rate');let diff='UNKNOWN';if(el.classList.contains('influence'))diff='INF';else if(el.classList.contains('hard'))diff='HARD';if(snEl&&achEl){sc.push({element:el,songName:snEl.textContent.trim(),achievement:parseFloat(achEl.textContent.trim()),difficulty:diff});}});return sc}function showPA(rates){const paEl=document.querySelector('.pa_skill span');if(!paEl)return;const curPA=parseFloat(paEl.textContent);const top30=rates.sort((a,b)=>b-a).slice(0,30);const below=top30.filter(r=>r<T);const above=top30.filter(r=>r>=T);const curAvg=below.length>0?below.reduce((s,r)=>s+r,0)/below.length:0;const aboveSum=above.reduce((s,r)=>s+r,0);let reqAvg=0;if(below.length>0)reqAvg=(T*30-aboveSum)/below.length;const box=document.createElement('div');box.className='pa-skill-analysis-box';box.style.cssText='background:white;border:2px solid #ddd;border-radius:8px;padding:20px;margin:20px 0;box-shadow:0 2px 8px rgba(0,0,0,0.1)';const st=curPA>=T?'達成済み！':'未達成';const sc=curPA>=T?'#4CAF50':'#FF6F00';box.innerHTML='<h3 style="margin:0 0 15px 0;font-size:18px;color:#333;border-bottom:2px solid #ff7bc0;padding-bottom:8px">PA SKILL分析</h3><div style="font-size:16px;color:#333;line-height:1.8"><p style="margin:8px 0"><strong>現在のPA SKILL:</strong> <span style="font-size:20px;color:#ff7bc0;font-weight:bold">'+curPA.toFixed(2)+'</span></p><p style="margin:8px 0"><strong>目標PA SKILL:</strong> <span style="font-size:20px;color:'+sc+';font-weight:bold">'+T.toFixed(1)+'</span> <span style="color:'+sc+';font-weight:bold;margin-left:10px">('+st+')</span></p><hr style="border:none;border-top:1px solid #eee;margin:15px 0">'+(below.length>0?'<p style="margin:8px 0"><strong>目標レート未満（&lt; '+T.toFixed(1)+'）の楽曲数:</strong> <span style="font-size:18px;color:#666;font-weight:bold">'+below.length+'曲</span> <span style="color:#999;font-size:14px;margin-left:10px">/ 30曲中</span></p><p style="margin:8px 0"><strong>現在の平均レート:</strong> <span style="font-size:18px;color:#666;font-weight:bold">'+curAvg.toFixed(2)+'</span></p>'+(curPA<T?'<p style="margin:8px 0"><strong>未達成曲の目標平均レート:</strong> <span style="font-size:18px;color:#FF6F00;font-weight:bold">'+reqAvg.toFixed(2)+'</span> <span style="color:#999;font-size:14px;margin-left:10px">(+'+(reqAvg-curAvg).toFixed(2)+')</span></p>':''):'<p style="margin:8px 0;color:#4CAF50;font-weight:bold">全ての楽曲が目標レート以上を達成しています！</p>')+'</div>';const old=document.querySelector('.pa-skill-analysis-box');if(old)old.remove();const pn=document.getElementById('pa-notice');const mb=document.querySelector('.music_data_box');if(pn&&mb)pn.parentNode.insertBefore(box,mb);}function calcRates(){const scs=extractScores();let suc=0,fail=0;const allR=[];scs.forEach(sc=>{const nn=norm(sc.songName);const key=nn+'_'+sc.difficulty;const c=cc[key];if(c!==undefined){const rate=calcRate(c,sc.achievement);allR.push(rate);const rd=document.createElement('span');rd.textContent=' [Rate: '+rate.toFixed(2)+']';rd.style.cssText='color:white;font-weight:bold;text-shadow:1px 1px 2px rgba(0,0,0,0.8);margin-left:10px;font-size:12px';rd.className='rate-display';const ti=document.createElement('div');if(rate>=T){ti.textContent='目標'+T.toFixed(1)+': 達成！';ti.style.color='#FFFFFF';}else{const gap=T-rate;const req=calcReq(c,T);if(req!==null&&req<=100)ti.textContent='目標'+T.toFixed(1)+'まで: +'+gap.toFixed(2)+' (要'+req.toFixed(2)+'%)';else ti.textContent='目標'+T.toFixed(1)+'まで: +'+gap.toFixed(2)+' (100%でも不可)';ti.style.color='#FFCC80';}ti.style.cssText+='font-weight:bold;text-shadow:1px 1px 2px rgba(0,0,0,0.8);font-size:11px;margin-left:10px;margin-top:2px';ti.className='target-info-display';const old1=sc.element.querySelector('.rate-display');if(old1)old1.remove();const old2=sc.element.querySelector('.target-info-display');if(old2)old2.remove();const snEl=sc.element.querySelector('.title_name');if(snEl){snEl.appendChild(rd);snEl.appendChild(ti);suc++;}}else{fail++;}});if(allR.length>0)showPA(allR);const res=document.createElement('div');res.style.cssText='position:fixed;top:80px;right:20px;background:rgba(0,0,0,0.8);color:white;padding:10px;border-radius:5px;z-index:10000;font-size:12px';res.textContent='成功: '+suc+'件, 失敗: '+fail+'件';document.body.appendChild(res);setTimeout(()=>res.remove(),5000);}if(!window.location.href.includes('p.eagate.573.jp/game/polarischord/pc/playdata/pa_skill.html')){alert('このブックマークレットはポラリスコードのPA SKILLページで使用してください。');return;}const ld=document.createElement('div');ld.style.cssText='position:fixed;top:20px;right:20px;background:linear-gradient(45deg,#ff6b9d,#ffa3d1);color:white;padding:12px 20px;border-radius:25px;z-index:10000;font-weight:bold;box-shadow:0 4px 12px rgba(255,107,157,0.3)';ld.textContent='譜面定数取得中...';document.body.appendChild(ld);fetchCC().then(()=>{ld.textContent='レート計算中...';calcRates();ld.textContent='計算完了！';ld.style.background='#4CAF50';setTimeout(()=>ld.remove(),3000);}).catch(e=>{console.error(e);ld.textContent='エラー発生';ld.style.background='#f44336';setTimeout(()=>ld.remove(),5000);});})();`;
+
+        // リンクとコードボックスに設定
+        document.getElementById('bookmarklet-link').href = bookmarkletCode;
+        document.getElementById('bookmarklet-code').textContent = bookmarkletCode;
+
+        function copyCode() {
+            const code = document.getElementById('bookmarklet-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ コードをコピーしました！\nブックマークのURL欄に貼り付けてください。');
+            }).catch(() => {
+                // フォールバック
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ コードをコピーしました！\nブックマークのURL欄に貼り付けてください。');
+            });
+        }
+    </script>
+</body>
+</html>
